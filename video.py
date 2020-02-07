@@ -5,7 +5,7 @@ import pil
 import matplotlib.pyplot as plt
 
 # Playing video from file:
-filename = './images/drop.mp4'
+filename = './images/002.mp4'
 cap = cv2.VideoCapture(filename)
 
 dirname = os.path.splitext(os.path.basename(filename))[0]
@@ -19,11 +19,11 @@ except OSError:
 
 currentFrame = 0
 success = True
-pixelNumbers = []
-frameStep = 100
-startFrame = 138
-finalFrame = 5080
-isSaveFrames = True
+areas = []
+frameStep = 20
+startFrame = 103
+finalFrame = 1000000
+isSaveFrames = False
 while(success):
     # Capture frame-by-frame
     success, frame = cap.read()
@@ -39,17 +39,22 @@ while(success):
     # Process image
     if currentFrame >= startFrame and currentFrame < finalFrame and currentFrame % frameStep ==0:
         #TODO: add roi
-        pixelNumber = pil.CountPixel(frame)
-        pixelNumbers.append(pixelNumber)
-
+        area, xCenter, yCenter, radius = pil.CountPixel(frame, False)
+        areas.append(area)
+        
+        frameCircle = cv2.circle(frame, ((int)(xCenter), (int)(yCenter)), (int)(radius), (255, 0, 0), 2) 
+        # Displaying the image  
+        cv2.imshow('Circle', frameCircle)
+        cv2.waitKey(1) 
+        
     # To stop duplicate images
     currentFrame += 1
 
 # Save results
 with open(dirname+'.txt', 'w') as f:
-    for pixelNumber in pixelNumbers:
-        f.write("%s\n" % pixelNumber)
-plt.plot(pixelNumbers)
+    for area in areas:
+        f.write("%s\n" % area)
+plt.plot(areas)
 plt.show()
 
 # When everything done, release the capture
