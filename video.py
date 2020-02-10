@@ -5,7 +5,7 @@ import pil
 import matplotlib.pyplot as plt
 
 # Playing video from file:
-filename = './images/002.mp4'
+filename = './images/003.mp4'
 cap = cv2.VideoCapture(filename)
 
 dirname = os.path.splitext(os.path.basename(filename))[0]
@@ -21,9 +21,9 @@ currentFrame = 0
 success = True
 areas = []
 frameStep = 20
-startFrame = 103
+startFrame = 100
 finalFrame = 1000000
-isSaveFrames = False
+isSaveFrames = True
 while(success):
     # Capture frame-by-frame
     success, frame = cap.read()
@@ -42,10 +42,11 @@ while(success):
         area, xCenter, yCenter, radius = pil.CountPixel(frame, False)
         areas.append(area)
         
-        frameCircle = cv2.circle(frame, ((int)(xCenter), (int)(yCenter)), (int)(radius), (255, 0, 0), 2) 
-        # Displaying the image  
-        cv2.imshow('Circle', frameCircle)
-        cv2.waitKey(1) 
+        # Displaying the image
+        if radius > 0:
+            frameCircle = cv2.circle(frame, ((int)(xCenter), (int)(yCenter)), (int)(radius), (255, 0, 0), 2) 
+            cv2.imshow('Circle', frameCircle)
+            cv2.waitKey(1) 
         
     # To stop duplicate images
     currentFrame += 1

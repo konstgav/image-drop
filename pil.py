@@ -41,9 +41,12 @@ def CountPixel(pic, needGrayShow):
         plt.show()
     pixelToCm = 5./220
     area = pixelCounter*pixelToCm*pixelToCm
-    xCenter = xCenter/pixelCounter
-    yCenter = yCenter/pixelCounter
-    r = sqrt(pixelCounter/pi)
+   
+    r = 0
+    if pixelCounter > 0:
+        xCenter = xCenter/pixelCounter
+        yCenter = yCenter/pixelCounter
+        r = sqrt(pixelCounter/pi)
     return area, xCenter, yCenter, r
 
 #picOrig = Image.open("./images/red-test.jpg")
