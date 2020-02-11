@@ -5,7 +5,7 @@ import pil
 import matplotlib.pyplot as plt
 
 # Playing video from file:
-filename = './images/003.mp4'
+filename = './images/004.mp4'
 cap = cv2.VideoCapture(filename)
 
 dirname = os.path.splitext(os.path.basename(filename))[0]
@@ -21,9 +21,10 @@ currentFrame = 0
 success = True
 areas = []
 frameStep = 20
-startFrame = 100
+startFrame = 152
 finalFrame = 1000000
-isSaveFrames = True
+isSaveFrames = False
+timestamps = []
 while(success):
     # Capture frame-by-frame
     success, frame = cap.read()
@@ -41,7 +42,8 @@ while(success):
         #TODO: add roi
         area, xCenter, yCenter, radius = pil.CountPixel(frame, False)
         areas.append(area)
-        
+        timestamps.append(cap.get(cv2.CAP_PROP_POS_MSEC))
+
         # Displaying the image
         if radius > 0:
             frameCircle = cv2.circle(frame, ((int)(xCenter), (int)(yCenter)), (int)(radius), (255, 0, 0), 2) 
@@ -53,11 +55,11 @@ while(success):
 
 # Save results
 with open(dirname+'.txt', 'w') as f:
-    for area in areas:
-        f.write("%s\n" % area)
+    for i in range(len(areas)):
+        f.write('%s %s \n' %(timestamps[i], areas[i]))
 plt.plot(areas)
 plt.show()
 
 # When everything done, release the capture
-#cap.release()
-#cv2.destroyAllWindows()
+cap.release()
+cv2.destroyAllWindows()

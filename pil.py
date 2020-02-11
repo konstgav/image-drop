@@ -18,10 +18,10 @@ def CountPixel(pic, needGrayShow):
     pixelCounter = 0
     grayArray = empty([height,width], int)
     threshold = 290
-    imin = 101
-    imax = 224
-    jmin = 273
-    jmax = 390
+    imin = 75
+    imax = 240
+    jmin = 225
+    jmax = 440
     xCenter = 0.
     yCenter = 0.
     for i in range(imin,imax+1):
@@ -39,7 +39,7 @@ def CountPixel(pic, needGrayShow):
         plt.gray()
         plt.imshow(grayArray[imin:imax+1, jmin:jmax+1])
         plt.show()
-    pixelToCm = 5./220
+    pixelToCm = 6./263
     area = pixelCounter*pixelToCm*pixelToCm
    
     r = 0
