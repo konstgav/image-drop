@@ -5,7 +5,7 @@ import pil
 import matplotlib.pyplot as plt
 
 # Playing video from file:
-filename = './images/004.mp4'
+filename = './images/yod01.mp4'
 cap = cv2.VideoCapture(filename)
 
 dirname = os.path.splitext(os.path.basename(filename))[0]
@@ -20,9 +20,9 @@ except OSError:
 currentFrame = 0
 success = True
 areas = []
-frameStep = 20
-startFrame = 152
-finalFrame = 1000000
+frameStep = 10
+startFrame = 2000
+finalFrame = 2111
 isSaveFrames = False
 timestamps = []
 while(success):
