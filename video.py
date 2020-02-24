@@ -3,13 +3,18 @@ import numpy as np
 import os
 import pil
 import matplotlib.pyplot as plt
+import sys
+import binarization
 
 # Playing video from file:
-filename = './images/yod01.mp4'
-cap = cv2.VideoCapture(filename)
+filename = './images/001.mp4'
+if os.path.exists(filename):
+    cap = cv2.VideoCapture(filename)
+else:
+    sys.exit('Error: No such file '+ str(filename))
 
 dirname = os.path.splitext(os.path.basename(filename))[0]
-print(dirname)
+print('Processing ' + dirname)
 
 try:
     if not os.path.exists(dirname):
@@ -17,13 +22,16 @@ try:
 except OSError:
     print ('Error: Creating directory of data')
 
+#TODO: serialize settings to json on disk
+#TODO: class with results
+#TODO: image processor class
 currentFrame = 0
 success = True
 areas = []
 frameStep = 10
-startFrame = 2000
+startFrame = 100
 finalFrame = 2111
-isSaveFrames = False
+isSaveFrames = True
 timestamps = []
 while(success):
     # Capture frame-by-frame
@@ -40,17 +48,19 @@ while(success):
     # Process image
     if currentFrame >= startFrame and currentFrame < finalFrame and currentFrame % frameStep ==0:
         #TODO: add roi
-        area, xCenter, yCenter, radius = pil.CountPixel(frame, False)
+        xmin = 250
+        xmax = 420
+        ymin = 80
+        ymax = 220
+
+        #area = pil.CountPixel(frame, False, True)
+        pixelCounter, thresholdImg, threshold = binarization.GetPixelsOtsuThreshold(frame, xmin, xmax, ymin, ymax)
+        contours = binarization.GetContours(thresholdImg, frame, True, xmin, ymin)
+        pixelToCm = 6./263
+        area = pixelCounter*pixelToCm*pixelToCm
         areas.append(area)
         timestamps.append(cap.get(cv2.CAP_PROP_POS_MSEC))
 
-        # Displaying the image
-        if radius > 0:
-            frameCircle = cv2.circle(frame, ((int)(xCenter), (int)(yCenter)), (int)(radius), (255, 0, 0), 2) 
-            cv2.imshow('Circle', frameCircle)
-            cv2.waitKey(1) 
-        
-    # To stop duplicate images
     currentFrame += 1
 
 # Save results

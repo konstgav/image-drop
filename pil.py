@@ -1,7 +1,7 @@
 from PIL import Image, ImageFilter
-from numpy import array, empty
+from numpy import array, empty, pi, sqrt
 import matplotlib.pyplot as plt
-from math import pi, sqrt
+import cv2
 
 def Resize(picOrig, compressCoef = 2):
     widthOrig, heightOrig = picOrig.size
@@ -11,7 +11,7 @@ def Resize(picOrig, compressCoef = 2):
     pic.save('redCompressed.JPG')
     return pic
 
-def CountPixel(pic, needGrayShow):
+def CountPixel(pic, needGrayShow, needCircleShow):
     data = array(pic)
     height = data.shape[0]
     width = data.shape[1]
@@ -41,19 +41,17 @@ def CountPixel(pic, needGrayShow):
         plt.show()
     pixelToCm = 6./263
     area = pixelCounter*pixelToCm*pixelToCm
-   
+
     r = 0
     if pixelCounter > 0:
         xCenter = xCenter/pixelCounter
         yCenter = yCenter/pixelCounter
         r = sqrt(pixelCounter/pi)
-    return area, xCenter, yCenter, r
 
-#picOrig = Image.open("./images/red-test.jpg")
-#redPixelCounter = CountPixel(picOrig)
-#print('red Pixel Counter: ', redPixelCounter)
-#pixelToCm = 1.4/179
-#redArea = redPixelCounter*pixelToCm*pixelToCm
-#exactArea = 1.5386
-#print('red Area: ', redArea)
-#print('exact Area: ', exactArea)
+    # Displaying the image
+    if needCircleShow and r > 0:
+        frameCircle = cv2.circle(pic, ((int)(xCenter), (int)(yCenter)), (int)(r), (255, 0, 0), 2) 
+        cv2.imshow('Circle', frameCircle)
+        cv2.waitKey(1)
+                
+    return area
