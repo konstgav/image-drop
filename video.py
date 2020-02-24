@@ -7,7 +7,7 @@ import sys
 import binarization
 
 # Playing video from file:
-filename = './images/001.mp4'
+filename = './images/fractal.mp4'
 if os.path.exists(filename):
     cap = cv2.VideoCapture(filename)
 else:
@@ -29,8 +29,8 @@ currentFrame = 0
 success = True
 areas = []
 frameStep = 10
-startFrame = 100
-finalFrame = 2111
+startFrame = 100000
+finalFrame = 1000
 isSaveFrames = True
 timestamps = []
 while(success):

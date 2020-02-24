@@ -21,6 +21,23 @@ def GetContours(thresholdImg, img, needToShow, xmin, ymin):
         p[0,1] += ymin
     cv2.drawContours(img, contours, maxContour, (255,0,0), 2)
     if needToShow:
+        if img.shape[:2][0]>600:
+            img = ResizeWithAspectRatio(img, height = 600)
         cv2.imshow('Contours', img)
         cv2.waitKey(1)
     return contours
+
+def ResizeWithAspectRatio(image, width=None, height=None, inter=cv2.INTER_AREA):
+    dim = None
+    (h, w) = image.shape[:2]
+
+    if width is None and height is None:
+        return image
+    if width is None:
+        r = height / float(h)
+        dim = (int(w * r), height)
+    else:
+        r = width / float(w)
+        dim = (width, int(h * r))
+
+    return cv2.resize(image, dim, interpolation=inter)
