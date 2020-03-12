@@ -25,7 +25,7 @@ def GetContours(thresholdImg, img, needToShow, xmin, ymin):
             img = ResizeWithAspectRatio(img, height = 600)
         cv2.imshow('Contours', img)
         cv2.waitKey(1)
-    return contours
+    return contour
 
 def ResizeWithAspectRatio(image, width=None, height=None, inter=cv2.INTER_AREA):
     dim = None

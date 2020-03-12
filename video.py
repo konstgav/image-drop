@@ -5,9 +5,10 @@ import pil
 import matplotlib.pyplot as plt
 import sys
 import binarization
+import analysis
 
 # Playing video from file:
-filename = './images/fractal.mp4'
+filename = './images/fractal1.MOV'
 if os.path.exists(filename):
     cap = cv2.VideoCapture(filename)
 else:
@@ -29,9 +30,9 @@ currentFrame = 0
 success = True
 areas = []
 frameStep = 10
-startFrame = 100000
-finalFrame = 1000
-isSaveFrames = True
+startFrame = 245
+finalFrame = 920
+isSaveFrames = False
 timestamps = []
 while(success):
     # Capture frame-by-frame
@@ -48,14 +49,15 @@ while(success):
     # Process image
     if currentFrame >= startFrame and currentFrame < finalFrame and currentFrame % frameStep ==0:
         #TODO: add roi
-        xmin = 250
-        xmax = 420
-        ymin = 80
-        ymax = 220
+        xmin = 1400
+        xmax = 2160
+        ymin = 640
+        ymax = 1500
 
         #area = pil.CountPixel(frame, False, True)
         pixelCounter, thresholdImg, threshold = binarization.GetPixelsOtsuThreshold(frame, xmin, xmax, ymin, ymax)
-        contours = binarization.GetContours(thresholdImg, frame, True, xmin, ymin)
+        contour = binarization.GetContours(thresholdImg, frame, True, xmin, ymin)
+        analysis.ProcessFrame(contour, dirname, currentFrame)
         pixelToCm = 6./263
         area = pixelCounter*pixelToCm*pixelToCm
         areas.append(area)
