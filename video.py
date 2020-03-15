@@ -1,21 +1,39 @@
 import cv2
 import numpy as np
 import os
+import json 
 import pil
 import matplotlib.pyplot as plt
 import sys
 import binarization
 import analysis
 
+# Reading video parameters from json file
+with open('fractal2.param', 'r')  as json_file:
+    videoParams = json.load(json_file)
+
+filename = videoParams['filename']
+dirname = videoParams['dirname']
+frameStep = videoParams['frameStep']
+startFrame = videoParams['startFrame']
+finalFrame = videoParams['finalFrame']
+isSaveFrames = videoParams['isSaveFrames']
+needToShowContour = videoParams['needToShowContour']
+xmin = videoParams['xmin']
+xmax = videoParams['xmax']
+ymin = videoParams['ymin']
+ymax = videoParams['ymax']
+needToSaveAreas = videoParams['needToSaveAreas']
+needToShowFFT = videoParams['needToShowFFT']
+MaxFreq = videoParams['MaxFreq']
+pixelToCm = videoParams['pixelToCm']
+ 
 # Playing video from file:
-filename = './images/fractal1.MOV'
 if os.path.exists(filename):
     cap = cv2.VideoCapture(filename)
+    print('Processing ' + dirname)
 else:
     sys.exit('Error: No such file '+ str(filename))
-
-dirname = os.path.splitext(os.path.basename(filename))[0]
-print('Processing ' + dirname)
 
 try:
     if not os.path.exists(dirname):
@@ -23,21 +41,22 @@ try:
 except OSError:
     print ('Error: Creating directory of data')
 
-#TODO: serialize settings to json on disk
 #TODO: class with results
 #TODO: image processor class
-currentFrame = 0
-success = True
-areas = []
-frameStep = 10
-startFrame = 245
-finalFrame = 920
-isSaveFrames = False
+#TODO: tkinter gui
+
 timestamps = []
-while(success):
+currentFrame = 0
+isSuccess = True
+areas = []
+figFFT = None
+if needToShowFFT:
+    figFFT = analysis.MakeFigureFFT()
+
+while(isSuccess):
     # Capture frame-by-frame
-    success, frame = cap.read()
-    if not success:
+    isSuccess, frame = cap.read()
+    if not isSuccess:
         break
 
     # Saves image of the current frame in jpg file
@@ -47,18 +66,11 @@ while(success):
         cv2.imwrite(name, frame)
 
     # Process image
-    if currentFrame >= startFrame and currentFrame < finalFrame and currentFrame % frameStep ==0:
-        #TODO: add roi
-        xmin = 1400
-        xmax = 2160
-        ymin = 640
-        ymax = 1500
-
+    if currentFrame >= startFrame and currentFrame < finalFrame and currentFrame % frameStep == 0:
         #area = pil.CountPixel(frame, False, True)
         pixelCounter, thresholdImg, threshold = binarization.GetPixelsOtsuThreshold(frame, xmin, xmax, ymin, ymax)
-        contour = binarization.GetContours(thresholdImg, frame, True, xmin, ymin)
-        analysis.ProcessFrame(contour, dirname, currentFrame)
-        pixelToCm = 6./263
+        contour = binarization.GetContours(thresholdImg, frame, needToShowContour, xmin, ymin)
+        analysis.ProcessFrame(contour, dirname, currentFrame, needToShowFFT, MaxFreq, figFFT)
         area = pixelCounter*pixelToCm*pixelToCm
         areas.append(area)
         timestamps.append(cap.get(cv2.CAP_PROP_POS_MSEC))
@@ -66,11 +78,12 @@ while(success):
     currentFrame += 1
 
 # Save results
-with open(dirname+'.txt', 'w') as f:
-    for i in range(len(areas)):
-        f.write('%s %s \n' %(timestamps[i], areas[i]))
-plt.plot(areas)
-plt.show()
+if needToSaveAreas:
+    with open(dirname + 'Areas.txt', 'w') as f:
+        for i in range(len(areas)):
+            f.write('%s %s \n' %(timestamps[i], areas[i]))
+    plt.plot(areas)
+    plt.show()
 
 # When everything done, release the capture
 cap.release()

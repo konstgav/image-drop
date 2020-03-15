@@ -1,0 +1,17 @@
+{
+    "filename": "./images/fractal2.MOV",
+    "dirname": "fractal2",
+    "frameStep": 1,
+    "startFrame": 338,
+    "finalFrame": 886,
+    "isSaveFrames": false,
+    "needToShowContour": true,
+    "xmin": 1060,
+    "xmax": 1868,
+    "ymin": 618,
+    "ymax": 1470,
+    "needToSaveAreas": true,
+    "needToShowFFT": true,
+    "MaxFreq": 600,
+    "pixelToCm": 0.022813688212927757
+}
