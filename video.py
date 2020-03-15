@@ -8,83 +8,106 @@ import sys
 import binarization
 import analysis
 
-# Reading video parameters from json file
-with open('fractal2.param', 'r')  as json_file:
-    videoParams = json.load(json_file)
-
-filename = videoParams['filename']
-dirname = videoParams['dirname']
-frameStep = videoParams['frameStep']
-startFrame = videoParams['startFrame']
-finalFrame = videoParams['finalFrame']
-isSaveFrames = videoParams['isSaveFrames']
-needToShowContour = videoParams['needToShowContour']
-xmin = videoParams['xmin']
-xmax = videoParams['xmax']
-ymin = videoParams['ymin']
-ymax = videoParams['ymax']
-needToSaveAreas = videoParams['needToSaveAreas']
-needToShowFFT = videoParams['needToShowFFT']
-MaxFreq = videoParams['MaxFreq']
-pixelToCm = videoParams['pixelToCm']
+class Video():
+    def __init__(self, videoParams):
+        self.filename = videoParams['filename']
+        self.dirname = videoParams['dirname']
+        self.frameStep = videoParams['frameStep']
+        self.startFrame = videoParams['startFrame']
+        self.finalFrame = videoParams['finalFrame']
+        self.isSaveFrames = videoParams['isSaveFrames']
+        self.needToShowContour = videoParams['needToShowContour']
+        self.xmin = videoParams['xmin']
+        self.xmax = videoParams['xmax']
+        self.ymin = videoParams['ymin']
+        self.ymax = videoParams['ymax']
+        self.needToSaveAreas = videoParams['needToSaveAreas']
+        self.needToShowFFT = videoParams['needToShowFFT']
+        self.MaxFreq = videoParams['MaxFreq']
+        self.pixelToCm = videoParams['pixelToCm']
+        self.startFileNumFFT = videoParams['startFileNumFFT']
+        self.NumPicFFT = videoParams['NumPicFFT']
  
-# Playing video from file:
-if os.path.exists(filename):
-    cap = cv2.VideoCapture(filename)
-    print('Processing ' + dirname)
-else:
-    sys.exit('Error: No such file '+ str(filename))
+        if os.path.exists(self.filename):
+            self.cap = cv2.VideoCapture(self.filename)
+        else:
+            sys.exit('Error: No such file '+ str(self.filename))
 
-try:
-    if not os.path.exists(dirname):
-        os.makedirs(dirname)
-except OSError:
-    print ('Error: Creating directory of data')
+        try:
+            if not os.path.exists(self.dirname):
+                os.makedirs(self.dirname)
+        except OSError:
+            print ('Error: Creating directory of data')
 
 #TODO: class with results
-#TODO: image processor class
-#TODO: tkinter gui
 
-timestamps = []
-currentFrame = 0
-isSuccess = True
-areas = []
-figFFT = None
-if needToShowFFT:
-    figFFT = analysis.MakeFigureFFT()
+        self.timestamps = []
+        self.isSuccess = True
+        self.areas = []
+        self.figFFT = None
+        if self.needToShowFFT:
+            self.figFFT = analysis.MakeFigureFFT()
 
-while(isSuccess):
-    # Capture frame-by-frame
-    isSuccess, frame = cap.read()
-    if not isSuccess:
-        break
+    def Run(self):
+        print('Processing ' + self.dirname)
+        currentFrame = 0
+        while(self.isSuccess):
+            # Capture frame-by-frame
+            self.isSuccess, frame = self.cap.read()
+            if not self.isSuccess:
+                break
 
-    # Saves image of the current frame in jpg file
-    name =  './' + dirname + '/frame' + str(currentFrame) + '.jpg'
-    print ('Creating...' + name)
-    if isSaveFrames:
-        cv2.imwrite(name, frame)
+            # Saves image of the current frame in jpg file
+            name =  './' + self.dirname + '/frame' + str(currentFrame) + '.jpg'
+            print ('Creating...' + name)
+            if self.isSaveFrames:
+                cv2.imwrite(name, frame)
 
-    # Process image
-    if currentFrame >= startFrame and currentFrame < finalFrame and currentFrame % frameStep == 0:
-        #area = pil.CountPixel(frame, False, True)
-        pixelCounter, thresholdImg, threshold = binarization.GetPixelsOtsuThreshold(frame, xmin, xmax, ymin, ymax)
-        contour = binarization.GetContours(thresholdImg, frame, needToShowContour, xmin, ymin)
-        analysis.ProcessFrame(contour, dirname, currentFrame, needToShowFFT, MaxFreq, figFFT)
-        area = pixelCounter*pixelToCm*pixelToCm
-        areas.append(area)
-        timestamps.append(cap.get(cv2.CAP_PROP_POS_MSEC))
+            # Process image
+            if currentFrame >= self.startFrame and currentFrame < self.finalFrame and currentFrame % self.frameStep == 0:
+                #area = pil.CountPixel(frame, False, True)
+                pixelCounter, thresholdImg, threshold = binarization.GetPixelsOtsuThreshold(frame,self.xmin, self.xmax, self.ymin, self.ymax)
+                contour = binarization.GetContours(thresholdImg, frame, self.needToShowContour, self.xmin, self.ymin)
+                analysis.ProcessFrame(contour, self.dirname, currentFrame, self.needToShowFFT, self.MaxFreq, self.figFFT)
+                area = pixelCounter*self.pixelToCm*self.pixelToCm
+                self.areas.append(area)
+                self.timestamps.append(self.cap.get(cv2.CAP_PROP_POS_MSEC))
 
-    currentFrame += 1
+            currentFrame += 1
 
-# Save results
-if needToSaveAreas:
-    with open(dirname + 'Areas.txt', 'w') as f:
-        for i in range(len(areas)):
-            f.write('%s %s \n' %(timestamps[i], areas[i]))
-    plt.plot(areas)
-    plt.show()
+        # Save results
+        if self.needToSaveAreas:
+            with open(self.dirname + 'Areas.txt', 'w') as f:
+                for i in range(len(self.areas)):
+                    f.write('%s %s \n' %(self.timestamps[i], self.areas[i]))
+            plt.plot(self.areas)
+            plt.show()
 
-# When everything done, release the capture
-cap.release()
-cv2.destroyAllWindows()
+        # When everything done, release the capture
+        self.cap.release()
+        cv2.destroyAllWindows()
+    
+    def AverageNUFFT(self):
+        Fouriers = []
+        for i in range(self.NumPicFFT):
+            filename = './' + self.dirname + '/contour'+(str)(self.startFileNumFFT+i) + '.txt'
+            print('Process ' + filename)
+            data = np.loadtxt(filename)
+            Fouriers.append(analysis.ApplyFINUFFT(data, False, self.MaxFreq, None))
+        print('Start FFT averaging ...')
+        averFourier = np.empty(self.MaxFreq)
+        for j in range(self.MaxFreq):
+            averFourier[j] = 0
+            for i in range(self.NumPicFFT):
+                N = len(Fouriers[i])
+                averFourier[j] += abs(Fouriers[i][N//2+j+1])
+            averFourier[j] /= self.NumPicFFT
+        print('Finish FFT averaging ...')    
+        plt.xlabel('Frequency-1')
+        plt.ylabel('|A|')
+        plt.title('Average Fourier Descriptors')
+        plt.plot(averFourier)
+        #plt.show()
+        plt.savefig(self.dirname + 'FFT.png')
+        return 1
+

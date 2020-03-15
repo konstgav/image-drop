@@ -13,5 +13,7 @@
     "needToSaveAreas": true,
     "needToShowFFT": true,
     "MaxFreq": 600,
-    "pixelToCm": 0.022813688212927757
+    "pixelToCm": 0.022813688212927757,
+    "startFileNumFFT": 600,
+    "NumPicFFT": 250
 }

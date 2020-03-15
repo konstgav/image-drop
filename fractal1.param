@@ -2,8 +2,8 @@
     "filename": "./images/fractal1.MOV",
     "dirname": "fractal1",
     "frameStep": 1,
-    "startFrame": 200,
-    "finalFrame": 900,
+    "startFrame": 249,
+    "finalFrame": 920,
     "isSaveFrames": false,
     "needToShowContour": true,
     "xmin": 1400,
@@ -13,5 +13,7 @@
     "needToSaveAreas": true,
     "needToShowFFT": true,
     "MaxFreq": 600,
-    "pixelToCm": 0.022813688212927757
+    "pixelToCm": 0.022813688212927757,
+    "startFileNumFFT": 600,
+    "NumPicFFT": 250
 }

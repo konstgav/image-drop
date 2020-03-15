@@ -1,61 +1,53 @@
 import tkinter as tk
 from tkinter import filedialog as fd
-from PIL import Image, ImageFilter, ImageTk
 import os
+import video
+import json
 
-class Pic:
-    def GetFilename(self):
-        filename = fd.askopenfilename(title='open')
-        return filename
+class ControllerVideo:
 
-    def OpenImage(self):
-        filename = self.GetFilename()
-        self._img = Image.open(filename)
-        size = (350, 350)
-        self._img.thumbnail(size)
-        imgTk = ImageTk.PhotoImage(self._img)
-        canvas.create_image(0,0,anchor=tk.NW, image=imgTk)
-        canvas.image = imgTk
+    def OpenVideo(self):
+        filename = fd.askopenfilename(title='Open video')
+        dirname = os.path.splitext(os.path.basename(filename))[0]
+        # Reading video parameters from json file
+        try:
+            with open(dirname + '.param', 'r')  as json_file:
+                videoParams = json.load(json_file)
+        except OSError:
+            print ('Error: cannot read videoparams from json-file')
+        canvas.delete("all")
+        canvas.create_text(200,200,text=json.dumps(videoParams, indent = 4))
+        self._video = video.Video(videoParams)
 
     def SaveImage(self):
         filename = fd.asksaveasfile(title='save', mode='w', defaultextension=".png")
-        if filename:
-            self._img.save(os.path.abspath(filename.name))
-
-    def ProcessBLUR(self):
-        self._img = self._img.filter(ImageFilter.BLUR)
-        imgTk = ImageTk.PhotoImage(self._img)
-        canvas.create_image(0,0,anchor=tk.NW, image=imgTk)
-        canvas.image = imgTk
-
-    def ProcessCONTOUR(self):
-        self._img = self._img.filter(ImageFilter.CONTOUR)
-        imgTk = ImageTk.PhotoImage(self._img)
-        canvas.create_image(0,0,anchor=tk.NW, image=imgTk)
-        canvas.image = imgTk
+   
+    def ProcessVideo(self):
+        self._video.Run()
+    
+    def AverageFFT(self):
+        self._video.AverageNUFFT()
 
 root = tk.Tk()
 root.geometry("400x400")
-root.wm_title("Image processor")
-img = Pic()
+root.wm_title("Image drop processor")
+controllerVideo = ControllerVideo()
 
 mainMenu = tk.Menu(root) 
 root.config(menu=mainMenu) 
  
 fileMenu = tk.Menu(mainMenu, tearoff=0)
-fileMenu.add_command(label="Open image", command = img.OpenImage)
-fileMenu.add_command(label="Save image", command = img.SaveImage)
-fileMenu.add_command(label="Open video")
-fileMenu.add_command(label="Quit", command=root.quit)
+fileMenu.add_command(label="Open video", command = controllerVideo.OpenVideo)
+fileMenu.add_command(label="Quit", command = root.quit)
  
-helpMenu = tk.Menu(mainMenu, tearoff=0)
-helpMenu.add_command(label="BLUR", command = img.ProcessBLUR)
-helpMenu.add_command(label="CONTOUR", command = img.ProcessCONTOUR)
- 
-mainMenu.add_cascade(label="File", menu=fileMenu)
-mainMenu.add_cascade(label="Tools", menu=helpMenu)
+toolsMenu = tk.Menu(mainMenu, tearoff=0)
+toolsMenu.add_command(label="Process video", command = controllerVideo.ProcessVideo)
+toolsMenu.add_command(label="Average FFT", command = controllerVideo.AverageFFT)
 
-canvas = tk.Canvas(root,  width=360, height=360)
+mainMenu.add_cascade(label = "File", menu = fileMenu)
+mainMenu.add_cascade(label = "Tools", menu = toolsMenu)
+
+canvas = tk.Canvas(root,  width=400, height=400)
 canvas.pack() 
 
 root.mainloop()
