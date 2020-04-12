@@ -1,14 +1,24 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import analysis
+import nfft
 
 def GenerateRandomData():
-    N = 30000
-    phi = 2*np.pi*np.random.random_sample(N) - np.pi
-    y = 1.+np.cos(4*phi)+np.sin(10*phi)
+    N = 1000
+    phi = np.random.random_sample(N) - 0.5
+    y = 20.+np.cos(40*np.pi*phi) + np.sin(100*np.pi*phi) + np.sin(60*np.pi*phi)
     data = np.empty((N,2),float)
-    data[:,0] = y*np.cos(phi)
-    data[:,1] = y*np.sin(phi)
+    data[:,0] = y*np.cos(2*np.pi*phi)
+    data[:,1] = y*np.sin(2*np.pi*phi)
+    return data
+
+def GenerateUniformDataTest():
+    N = 1000
+    phi = np.linspace(-0.5, 0.5, N)
+    y = 20.+np.cos(40*np.pi*phi) + np.sin(100*np.pi*phi)
+    data = np.empty((N,2),float)
+    data[:,0] = y*np.cos(2*np.pi*phi)
+    data[:,1] = y*np.sin(2*np.pi*phi)
     return data
 
 def AverageNUFFT(dirname, NumPic, startFileNum, MaxFreq):
@@ -33,11 +43,11 @@ def AverageNUFFT(dirname, NumPic, startFileNum, MaxFreq):
     plt.plot(averFourier)
     #plt.show()
     plt.savefig(dirname + 'FFT.png')
-    return 1
 
-AverageNUFFT('fractal2', NumPic = 350, startFileNum = 500, MaxFreq = 600)
-
-
+#AverageNUFFT('fractal2', NumPic = 350, startFileNum = 500, MaxFreq = 600)
 #data = np.loadtxt('./fractal1/contour910.txt')
-#data = GenerateRandomData()
-#analysis.ApplyFINUFFT(data)
+#data = GenerateUniformDataTest()
+data = GenerateRandomData()
+analysis.ApplyFINUFFT(data, 'True', 60, analysis.MakeFigureFFT())
+analysis.Apply_nfft(data, 'True', 60, analysis.MakeFigureFFT())
+input("Press Enter to continue...")

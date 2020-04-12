@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog as fd
+from tkinter import messagebox
 import os
 import video
 import json
@@ -9,15 +10,17 @@ class ControllerVideo:
     def OpenVideo(self):
         filename = fd.askopenfilename(title='Open video')
         dirname = os.path.splitext(os.path.basename(filename))[0]
+        json_filename = dirname + '.param'
         # Reading video parameters from json file
         try:
-            with open(dirname + '.param', 'r')  as json_file:
+            with open(json_filename, 'r')  as json_file:
                 videoParams = json.load(json_file)
+                canvas.delete("all")
+                canvas.create_text(200,200,text=json.dumps(videoParams, indent = 4))
+                self._video = video.Video(videoParams)
         except OSError:
             print ('Error: cannot read videoparams from json-file')
-        canvas.delete("all")
-        canvas.create_text(200,200,text=json.dumps(videoParams, indent = 4))
-        self._video = video.Video(videoParams)
+            messagebox.showwarning("Error", "Сannot open file %s with videoparams" % json_filename)
 
     def SaveImage(self):
         filename = fd.asksaveasfile(title='save', mode='w', defaultextension=".png")

@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import finufftpy
+import nfft
 
 def ProcessFrame(contour, dirname, currentFrame,needToShowFFT, MaxFreq, figFFT):
     N = contour.shape[0]
@@ -11,8 +12,35 @@ def ProcessFrame(contour, dirname, currentFrame,needToShowFFT, MaxFreq, figFFT):
     np.savetxt(filename, data)
     #TODO: Разбить на мелкие эквидистантные интервалы контур
     #GetFourierDescriptors(data)
-    ApplyFINUFFT(data, needToShowFFT, MaxFreq, figFFT)
+    #ApplyFINUFFT(data, needToShowFFT, MaxFreq, figFFT)
+    Apply_nfft(data, needToShowFFT, MaxFreq, figFFT)
     return 1
+
+#TODO: delete govnocode
+def Apply_nfft(data, needToShowFFT, MaxFreq, figFFT):
+    N = data.shape[0]
+    if N%2 != 0:
+        data = data[0:N-1,:]
+        N = N-1
+    phi = np.empty(N,float)
+    xc = sum(data[:,0])/N
+    yc = sum(data[:,1])/N
+    phi = 0.5*np.arctan2(data[:,1]-yc, data[:,0]-xc)/np.pi
+    points = np.empty((N,3),float) 
+    points[:,0] = data[:,0]
+    points[:,1] = data[:,1]
+    points[:,2] = phi
+    points = points[points[:,2].argsort()]
+    contour_complex = points[:, 0] - xc + 1j*(points[:, 1] - yc)
+    
+    F = nfft.nfft(points[:,2], contour_complex)
+    # adj = nfft.ndft_adjoint(phi, F, N)
+    # plt.plot(phi, abs(adj),'x')
+    # plt.pause(10)
+
+    if needToShowFFT:
+        PlotNonuniformData(data, F, MaxFreq, figFFT)
+    return F 
 
 def ApplyFINUFFT(data, needToShowFFT, MaxFreq, figFFT):
     N = data.shape[0]
@@ -30,7 +58,7 @@ def ApplyFINUFFT(data, needToShowFFT, MaxFreq, figFFT):
     F = np.zeros([N], dtype=np.complex128)     # allocate F (modes out)
     ret = finufftpy.nufft1d1(phi, contour_complex, iflag, acc, N, F)
     if needToShowFFT:
-        PlotNonuniformData(data,F,MaxFreq, figFFT)
+        PlotNonuniformData(data, F, MaxFreq, figFFT)
     return F
 
 def MakeFigureFFT():
@@ -39,7 +67,7 @@ def MakeFigureFFT():
     ax1 = fig.add_subplot(122)
     return fig
 
-def PlotNonuniformData(data,F,MaxFreq, figFFT):
+def PlotNonuniformData(data, F, MaxFreq, figFFT):
     N = F.shape[0]
     ax0 = figFFT.axes[0]
     ax1 = figFFT.axes[1]
@@ -47,9 +75,9 @@ def PlotNonuniformData(data,F,MaxFreq, figFFT):
     ax1.cla()
     ax0.set(aspect = 1, xlabel = 'x', ylabel = 'y', title = 'Contour')
     ax0.invert_yaxis()
-    ax1.set(xlabel = 'Frequency-1', ylabel = '|A|', title = 'Fourier Descriptors')
+    ax1.set(xlabel = 'Frequency', ylabel = '|A|', title = 'Fourier Descriptors')
     ax0.plot(data[:,0],data[:,1])
-    ax1.plot(abs(F[N//2+1:N//2+MaxFreq]))
+    ax1.plot(abs(F[N//2:N//2+MaxFreq]))
     plt.draw()
     plt.pause(0.001)
     return 1

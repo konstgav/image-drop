@@ -77,7 +77,7 @@ class Video():
 
         # Save results
         if self.needToSaveAreas:
-            with open(self.dirname + 'Areas.txt', 'w') as f:
+            with open(self.dirname + '_Areas.txt', 'w') as f:
                 for i in range(len(self.areas)):
                     f.write('%s %s \n' %(self.timestamps[i], self.areas[i]))
             plt.plot(self.areas)
@@ -93,21 +93,21 @@ class Video():
             filename = './' + self.dirname + '/contour'+(str)(self.startFileNumFFT+i) + '.txt'
             print('Process ' + filename)
             data = np.loadtxt(filename)
-            Fouriers.append(analysis.ApplyFINUFFT(data, False, self.MaxFreq, None))
+            Fouriers.append(analysis.Apply_nfft(data, False, self.MaxFreq, None))
         print('Start FFT averaging ...')
         averFourier = np.empty(self.MaxFreq)
         for j in range(self.MaxFreq):
             averFourier[j] = 0
             for i in range(self.NumPicFFT):
                 N = len(Fouriers[i])
-                averFourier[j] += abs(Fouriers[i][N//2+j+1])
+                averFourier[j] += abs(Fouriers[i][N//2+j])
             averFourier[j] /= self.NumPicFFT
         print('Finish FFT averaging ...')    
-        plt.xlabel('Frequency-1')
+        plt.xlabel('Frequency')
         plt.ylabel('|A|')
         plt.title('Average Fourier Descriptors')
         plt.plot(averFourier)
-        #plt.show()
-        plt.savefig(self.dirname + 'FFT.png')
+        plt.savefig(self.dirname + '_AverFFT.png')
+        plt.show()
         return 1
 
