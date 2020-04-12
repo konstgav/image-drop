@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 import os
 import json 
-import pil
 import matplotlib.pyplot as plt
 import sys
 import binarization
@@ -102,7 +101,8 @@ class Video():
                 N = len(Fouriers[i])
                 averFourier[j] += abs(Fouriers[i][N//2+j])
             averFourier[j] /= self.NumPicFFT
-        print('Finish FFT averaging ...')    
+        print('Finish FFT averaging ...')
+        np.savetxt(self.dirname + '_AverFFT.txt', averFourier)  
         plt.xlabel('Frequency')
         plt.ylabel('|A|')
         plt.title('Average Fourier Descriptors')

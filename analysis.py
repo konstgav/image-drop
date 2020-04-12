@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import finufftpy
 import nfft
 
 def ProcessFrame(contour, dirname, currentFrame,needToShowFFT, MaxFreq, figFFT):
@@ -41,25 +40,6 @@ def Apply_nfft(data, needToShowFFT, MaxFreq, figFFT):
     if needToShowFFT:
         PlotNonuniformData(data, F, MaxFreq, figFFT)
     return F 
-
-def ApplyFINUFFT(data, needToShowFFT, MaxFreq, figFFT):
-    N = data.shape[0]
-    phi = np.empty(N,float)
-    xc = sum(data[:,0])/N
-    yc = sum(data[:,1])/N
-    contour_complex = np.empty(N, dtype=complex)
-    contour_complex.real = data[:, 0]
-    contour_complex.imag = data[:, 1]
-    for i in range(N):
-        phi[i] = np.arctan2(data[i,1]-yc, data[i,0]-xc)
-    
-    acc = 1.e-9
-    iflag = 1
-    F = np.zeros([N], dtype=np.complex128)     # allocate F (modes out)
-    ret = finufftpy.nufft1d1(phi, contour_complex, iflag, acc, N, F)
-    if needToShowFFT:
-        PlotNonuniformData(data, F, MaxFreq, figFFT)
-    return F
 
 def MakeFigureFFT():
     fig = plt.figure(figsize=(13,5))
