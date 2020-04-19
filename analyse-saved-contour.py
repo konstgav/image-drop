@@ -4,9 +4,9 @@ import analysis
 import nfft
 
 def GenerateRandomData():
-    N = 1000
+    N = 10000
     phi = np.random.random_sample(N) - 0.5
-    y = 20.+np.cos(40*np.pi*phi) + np.sin(100*np.pi*phi) + np.sin(60*np.pi*phi)
+    y = 10.+np.cos(40*np.pi*phi) + np.sin(100*np.pi*phi) + np.sin(60*np.pi*phi)
     data = np.empty((N,2),float)
     data[:,0] = y*np.cos(2*np.pi*phi)
     data[:,1] = y*np.sin(2*np.pi*phi)

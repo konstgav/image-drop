@@ -92,7 +92,7 @@ class Video():
             filename = './' + self.dirname + '/contour'+(str)(self.startFileNumFFT+i) + '.txt'
             print('Process ' + filename)
             data = np.loadtxt(filename)
-            Fouriers.append(analysis.Apply_nfft(data, False, self.MaxFreq, None))
+            Fouriers.append(analysis.ApplyFINUFFT(data, False, self.MaxFreq, None))
         print('Start FFT averaging ...')
         averFourier = np.empty(self.MaxFreq)
         for j in range(self.MaxFreq):
