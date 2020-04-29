@@ -30,7 +30,7 @@ class Video():
         if os.path.exists(self.filename):
             self.cap = cv2.VideoCapture(self.filename)
         else:
-            sys.exit('Error: No such file '+ str(self.filename))
+            sys.exit('Error: No such videofile '+ str(self.filename))
 
         try:
             if not os.path.exists(self.dirname):
@@ -88,11 +88,14 @@ class Video():
     
     def AverageNUFFT(self):
         Fouriers = []
-        for i in range(self.NumPicFFT):
-            filename = './' + self.dirname + '/contour'+(str)(self.startFileNumFFT+i) + '.txt'
-            print('Process ' + filename)
-            data = np.loadtxt(filename)
-            Fouriers.append(analysis.ApplyFINUFFT(data, False, self.MaxFreq, None))
+        try:
+            for i in range(self.NumPicFFT):
+                filename = './' + self.dirname + '/contour'+(str)(self.startFileNumFFT+i) + '.txt'
+                print('Process ' + filename)
+                data = np.loadtxt(filename)
+                Fouriers.append(analysis.ApplyFINUFFT(data, False, self.MaxFreq, None))
+        except OSError:
+            print ('Error: cannot read contours from .txt files')
         print('Start FFT averaging ...')
         averFourier = np.empty(self.MaxFreq)
         for j in range(self.MaxFreq):

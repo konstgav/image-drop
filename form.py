@@ -9,22 +9,22 @@ class ControllerVideo:
 
     def OpenVideo(self):
         filename = fd.askopenfilename(title='Open video')
-        dirname = os.path.splitext(os.path.basename(filename))[0]
-        json_filename = dirname + '.param'
+        video_file_dir = os.path.dirname(filename)
+        short_filename_withoutext = os.path.splitext(os.path.basename(filename))[0]
+        json_filename = os.path.join(video_file_dir, short_filename_withoutext + '.param')
         # Reading video parameters from json file
         try:
             with open(json_filename, 'r')  as json_file:
                 videoParams = json.load(json_file)
                 canvas.delete("all")
                 canvas.create_text(200,200,text=json.dumps(videoParams, indent = 4))
+                #TODO: переделать
+                videoParams['filename'] = filename
                 self._video = video.Video(videoParams)
         except OSError:
             print ('Error: cannot read videoparams from json-file')
             messagebox.showwarning("Error", "Сannot open file %s with videoparams" % json_filename)
 
-    def SaveImage(self):
-        filename = fd.asksaveasfile(title='save', mode='w', defaultextension=".png")
-   
     def ProcessVideo(self):
         self._video.Run()
     

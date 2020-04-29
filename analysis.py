@@ -8,6 +8,7 @@ def ProcessFrame(contour, dirname, currentFrame,needToShowFFT, MaxFreq, figFFT):
     data = np.empty((N,2),float)
     data[:,0] = contour[:,0,0]
     data[:,1] = contour[:,0,1]
+    #TODO: изменить путь для сохранения результатов
     filename = './' + dirname + '/contour' + str(currentFrame) + '.txt'
     np.savetxt(filename, data)
     #TODO: Разбить на мелкие эквидистантные интервалы контур
