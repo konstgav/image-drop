@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
+#TODO: требуется рефакторинг, убрать комментарии
+
 def func(x, k, b):
     return k*x + b
 
