@@ -1,0 +1,9 @@
+version: '3'
+services:
+  web:
+    image: "konstgav/image-drop:0.1"
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    environment:
+      - DISPLAY=unix$DISPLAY
+    
