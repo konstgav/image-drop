@@ -2,6 +2,15 @@
 Web app for analyse video files with spreading and evaporating drops.
 Finds irregular contour, computes FFT, fractal dimesion, drop area.
 
+### Generate image
+docker login
+docker image build -t konstgav/image-drop:0.1 .
+dicker push konstgav/image-drop:0.1
+
+### Run image
+sudo xhost +local:
+docker container run -it --rm -v my-vol:/home/ -e DISPLAY=unix$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix konstgav/image-drop:0.1
+
 ## Поля файлов \*.param
     "filename": путь к видеофайлу
     "dirname": название видеофайла
