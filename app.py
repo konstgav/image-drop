@@ -5,7 +5,7 @@ from filepath import filepath
 from flask import Flask, flash, request, redirect, url_for, send_from_directory, render_template, session
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = "."
+UPLOAD_FOLDER = "/home/"
 ALLOWED_EXTENSIONS = {'avi', 'mov', 'mp4', 'param'}
 user = 'konst'
 

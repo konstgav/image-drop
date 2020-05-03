@@ -13,4 +13,4 @@ RUN make test
 RUN make lib
 RUN make python3
 WORKDIR /app/image-drop-web
-CMD [ "python3", "./form.py" ]
+CMD [ "python3", "./app.py" ]
