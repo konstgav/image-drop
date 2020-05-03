@@ -1,0 +1,8 @@
+<!doctype html>
+<title>Image-drop web-application</title>
+  <h1>Image-drop web-application</h1>
+  <ol>
+        <li> <a href="{{ url_for('upload_file') }}"> Upload files</a></li>
+        <li> <a href="{{ url_for('process', case = 'fractal1') }}"> Process case </a></li>
+        <li> <a href="{{ url_for('dir_listing', req_path='konst/') }}"> Dowload results </a></li>
+  </ol>

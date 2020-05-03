@@ -34,6 +34,11 @@ class filepath:
         os.makedirs(path, exist_ok=True)
         return path
 
+    def to_case_dir(self):
+        path = self.__case_dir
+        os.makedirs(path, exist_ok=True)
+        return path
+
     def to_ffts_dir(self):
         path = os.path.join(self.__case_dir, 'ffts')
         os.makedirs(path, exist_ok=True)
@@ -41,6 +46,11 @@ class filepath:
 
     def to_results_dir(self):
         path = os.path.join(self.__case_dir, 'results')
+        os.makedirs(path, exist_ok=True)
+        return path
+    
+    def to_user_dir(self):
+        path = os.path.join(self.__workdir, self.__user)
         os.makedirs(path, exist_ok=True)
         return path
 
