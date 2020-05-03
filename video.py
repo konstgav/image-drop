@@ -6,11 +6,10 @@ import matplotlib.pyplot as plt
 import sys
 import binarization
 import analysis
+from fractaldimension import fractal_dimension
 
 class Video():
-    def __init__(self, videoParams):
-        self.filename = videoParams['filename']
-        self.dirname = videoParams['dirname']
+    def __init__(self, videoParams, fpath):
         self.frameStep = videoParams['frameStep']
         self.startFrame = videoParams['startFrame']
         self.finalFrame = videoParams['finalFrame']
@@ -26,17 +25,12 @@ class Video():
         self.pixelToCm = videoParams['pixelToCm']
         self.startFileNumFFT = videoParams['startFileNumFFT']
         self.NumPicFFT = videoParams['NumPicFFT']
+        self.fpath = fpath
  
-        if os.path.exists(self.filename):
-            self.cap = cv2.VideoCapture(self.filename)
+        if os.path.exists(self.fpath.to_videofile()):
+            self.cap = cv2.VideoCapture(self.fpath.to_videofile())
         else:
-            sys.exit('Error: No such videofile '+ str(self.filename))
-
-        try:
-            if not os.path.exists(self.dirname):
-                os.makedirs(self.dirname)
-        except OSError:
-            print ('Error: Creating directory of data')
+            sys.exit('Error: No such videofile '+ str(self.fpath.to_videofile()))
 
 #TODO: class with results
 
@@ -48,7 +42,7 @@ class Video():
             self.figFFT = analysis.MakeFigureFFT()
 
     def Run(self):
-        print('Processing ' + self.dirname)
+        print('Processing ' + self.fpath.to_case())
         currentFrame = 0
         while(self.isSuccess):
             # Capture frame-by-frame
@@ -57,7 +51,7 @@ class Video():
                 break
 
             # Saves image of the current frame in jpg file
-            name =  './' + self.dirname + '/frame' + str(currentFrame) + '.jpg'
+            name =  os.path.join(self.fpath.to_images_dir(), 'frame' + str(currentFrame) + '.jpg')
             print ('Creating...' + name)
             if self.isSaveFrames:
                 cv2.imwrite(name, frame)
@@ -67,7 +61,7 @@ class Video():
                 #area = pil.CountPixel(frame, False, True)
                 pixelCounter, thresholdImg, threshold = binarization.GetPixelsOtsuThreshold(frame,self.xmin, self.xmax, self.ymin, self.ymax)
                 contour = binarization.GetContours(thresholdImg, frame, self.needToShowContour, self.xmin, self.ymin)
-                analysis.ProcessFrame(contour, self.dirname, currentFrame, self.needToShowFFT, self.MaxFreq, self.figFFT)
+                analysis.ProcessFrame(contour, self.fpath, currentFrame, self.needToShowFFT, self.MaxFreq, self.figFFT)
                 area = pixelCounter*self.pixelToCm*self.pixelToCm
                 self.areas.append(area)
                 self.timestamps.append(self.cap.get(cv2.CAP_PROP_POS_MSEC))
@@ -76,11 +70,14 @@ class Video():
 
         # Save results
         if self.needToSaveAreas:
-            with open(self.dirname + '_Areas.txt', 'w') as f:
+            with open(os.path.join(self.fpath.to_results_dir(), 'areas.txt'), 'w') as f:
                 for i in range(len(self.areas)):
                     f.write('%s %s \n' %(self.timestamps[i], self.areas[i]))
             plt.plot(self.areas)
-            plt.show()
+            #plt.show()
+            plt.savefig(os.path.join(self.fpath.to_results_dir(), 'areas.png'))
+
+#TODO: save picture 
 
         # When everything done, release the capture
         self.cap.release()
@@ -90,7 +87,7 @@ class Video():
         Fouriers = []
         try:
             for i in range(self.NumPicFFT):
-                filename = './' + self.dirname + '/contour'+(str)(self.startFileNumFFT+i) + '.txt'
+                filename = os.path.join(self.fpath.to_contours_dir(), 'contour' + (str)(self.startFileNumFFT+i) + '.txt')
                 print('Process ' + filename)
                 data = np.loadtxt(filename)
                 Fouriers.append(analysis.ApplyFINUFFT(data, False, self.MaxFreq, None))
@@ -105,12 +102,14 @@ class Video():
                 averFourier[j] += abs(Fouriers[i][N//2+j])
             averFourier[j] /= self.NumPicFFT
         print('Finish FFT averaging ...')
-        np.savetxt(self.dirname + '_AverFFT.txt', averFourier)  
+        np.savetxt(os.path.join(self.fpath.to_results_dir(), 'averFFT.txt'), averFourier)  
         plt.xlabel('Frequency')
         plt.ylabel('|A|')
         plt.title('Average Fourier Descriptors')
         plt.plot(averFourier)
-        plt.savefig(self.dirname + '_AverFFT.png')
-        plt.show()
-        return 1
+        plt.savefig(os.path.join(self.fpath.to_results_dir(), 'averFFT.png'))
+        #plt.show()
 
+    def compute_fractal_dimension(self):
+        fd = fractal_dimension(self.fpath)
+        fd.compute()
