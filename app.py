@@ -5,13 +5,13 @@ from filepath import filepath
 from flask import Flask, flash, request, redirect, url_for, send_from_directory, render_template, session
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = "/home/"
+UPLOAD_FOLDER = "."
 ALLOWED_EXTENSIONS = {'avi', 'mov', 'mp4', 'param'}
 user = 'konst'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-fpath = filepath(UPLOAD_FOLDER, user, 'empty.dat')
+fpath = filepath(UPLOAD_FOLDER, user)
 
 @app.route('/')
 def index():
@@ -45,6 +45,7 @@ def upload_file():
 @app.route('/process/<case>',  methods=['GET', 'POST'])
 def process(case):
     if request.method == 'POST':
+        fpath.set_case(case)
         json_file = open(fpath.to_param_file(), 'r')
         videoParams = json.load(json_file)
         video = Video(videoParams, fpath)

@@ -1,17 +1,23 @@
 import os
 
+#TODO: исправить говнокод с именем файла
 class filepath:
-    def __init__(self, workdir, user, videofilename):
+    def __init__(self, workdir, user):
         self.__workdir = workdir
         self.__user = user
-        self.__case = os.path.splitext(videofilename)[0]
-        self.__case_dir = os.path.join(self.__workdir, self.__user, self.__case)
-        self.__videofilename = videofilename
     
     def set_videofilename(self, videofilename):
         self.__case = os.path.splitext(videofilename)[0]
         self.__case_dir = os.path.join(self.__workdir, self.__user, self.__case)
         self.__videofilename = videofilename
+
+    def set_case(self, case):
+        self.__case = case
+        self.__case_dir = os.path.join(self.__workdir, self.__user, self.__case)
+        path = os.path.join(self.__case_dir, 'video')
+        for file in os.listdir(path):
+            if file.endswith(".mov"):
+                self.__videofilename = file
 
     def to_video_file(self, filename):
         path = os.path.join(self.__case_dir, 'video')
