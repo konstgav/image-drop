@@ -20,6 +20,7 @@ def GetContours(thresholdImg, img, needToShow, xmin, ymin):
         p[0,0] += xmin
         p[0,1] += ymin
     cv2.drawContours(img, contours, maxContour, (255,0,0), 2)
+#    cv2.imwrite('test.png', img)
     if needToShow:
         if img.shape[:2][0]>600:
             img = ResizeWithAspectRatio(img, height = 600)

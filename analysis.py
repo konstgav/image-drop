@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import matplotlib.pyplot as plt
-import finufftpy
+import finufft
 
 def ProcessFrame(contour, fpath, currentFrame,needToShowFFT, MaxFreq, figFFT):
     N = contour.shape[0]
@@ -30,7 +30,7 @@ def ApplyFINUFFT(data, needToShowFFT, MaxFreq, figFFT):
     acc = 1.e-9
     iflag = 1
     F = np.zeros([N], dtype=np.complex128)     # allocate F (modes out)
-    ret = finufftpy.nufft1d1(phi, contour_complex, iflag, acc, N, F)
+    ret = finufft.nufft1d1(phi, contour_complex, None, F, acc, iflag)
     if needToShowFFT:
         PlotNonuniformData(data, F, MaxFreq, figFFT)
     return F

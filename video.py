@@ -26,7 +26,7 @@ class Video():
         self.startFileNumFFT = videoParams['startFileNumFFT']
         self.NumPicFFT = videoParams['NumPicFFT']
         self.fpath = fpath
- 
+
         if os.path.exists(self.fpath.to_videofile()):
             self.cap = cv2.VideoCapture(self.fpath.to_videofile())
         else:
@@ -58,8 +58,8 @@ class Video():
 
             # Process image
             if currentFrame >= self.startFrame and currentFrame < self.finalFrame and currentFrame % self.frameStep == 0:
-                #area = pil.CountPixel(frame, False, True)
-                pixelCounter, thresholdImg, threshold = binarization.GetPixelsOtsuThreshold(frame,self.xmin, self.xmax, self.ymin, self.ymax)
+                #cv2.imwrite('test.png', frame)
+                pixelCounter, thresholdImg, threshold = binarization.GetPixelsOtsuThreshold(frame, self.xmin, self.xmax, self.ymin, self.ymax)
                 contour = binarization.GetContours(thresholdImg, frame, self.needToShowContour, self.xmin, self.ymin)
                 analysis.ProcessFrame(contour, self.fpath, currentFrame, self.needToShowFFT, self.MaxFreq, self.figFFT)
                 area = pixelCounter*self.pixelToCm*self.pixelToCm
@@ -67,6 +67,9 @@ class Video():
                 self.timestamps.append(self.cap.get(cv2.CAP_PROP_POS_MSEC))
 
             currentFrame += 1
+
+            if currentFrame >= self.finalFrame:
+                break
 
         # Save results
         if self.needToSaveAreas:
@@ -111,5 +114,5 @@ class Video():
         #plt.show()
 
     def compute_fractal_dimension(self):
-        fd = fractal_dimension(self.fpath)
+        fd = fractal_dimension(self.fpath, self.finalFrame-51, self.finalFrame-1)
         fd.compute()

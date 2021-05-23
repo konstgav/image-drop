@@ -10,12 +10,14 @@ def func(x, k, b):
     return k*x + b
 
 class fractal_dimension:
-    def __init__(self, fpath):
+    def __init__(self, fpath, start_frame, finish_frame):
         self.fpath = fpath
+        self.start_frame = start_frame
+        self.finish_frame = finish_frame
 
     def compute(self):
         with open(os.path.join(self.fpath.to_results_dir(), 'dimensions-frac.txt'), 'w') as f:
-            aver, accuracy = self.average_fractal_dim(450, 500)
+            aver, accuracy = self.average_fractal_dim(self.start_frame, self.finish_frame)
             print('Fractal dimension:')
             print(aver, accuracy)
             f.write("{:5.3f} {:5.3f} \n".format(aver, accuracy))
